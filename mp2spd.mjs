@@ -36,8 +36,20 @@ class MP2SPD {
         console.log(`File Hash : ${fileHash}`);
         const newFileHashedObjectPath = path.join(this.objectsPath, fileHash);
         await fs.writeFile(newFileHashedObjectPath, fileData);
-        // TODO : add file to staging area
+        // add file to staging area
+        await this.updateStagingArea(fileToBeAdded, fileHash);
         console.log(`Added ${fileToBeAdded}`);
+    }
+
+    async updateStagingArea(filePath, fileHash) {
+        const index = JSON.parse(
+                await fs.readFile(
+                        this.indexPath, 
+                        { encoding: "utf-8" }
+                    )
+                );
+        index.push({ path: filePath, hash: fileHash });
+        await fs.writeFile(this.indexPath, JSON.stringify(index));
     }
 
 }
