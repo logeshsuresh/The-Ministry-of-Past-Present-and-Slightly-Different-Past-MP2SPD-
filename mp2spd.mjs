@@ -36,7 +36,7 @@ class MP2SPD {
         console.log(`File Hash : ${fileHash}`);
         const newFileHashedObjectPath = path.join(this.objectsPath, fileHash);
         await fs.writeFile(newFileHashedObjectPath, fileData);
-        // add file to staging area
+        // TODO : add file to staging area
         console.log(`Added ${fileToBeAdded}`);
     }
 
