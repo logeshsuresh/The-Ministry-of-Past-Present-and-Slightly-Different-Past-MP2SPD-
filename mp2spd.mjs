@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs/promises";
+import crypto from "crypto";
 
 class MP2SPD {
 
@@ -21,6 +22,25 @@ class MP2SPD {
         }
     }
 
+    hashObject(content) {
+        return crypto
+                .createHash("sha1")
+                .update(content, "utf-8")
+                .digest("hex");
+    } 
+
+    async add(fileToBeAdded) {
+        // fileToBeAdded : path/to/file
+        const fileData = await fs.readFile(fileToBeAdded, { encoding: "utf-8" });
+        const fileHash = this.hashObject(fileData); // hash the file
+        console.log(`File Hash : ${fileHash}`);
+        const newFileHashedObjectPath = path.join(this.objectsPath, fileHash);
+        await fs.writeFile(newFileHashedObjectPath, fileData);
+        // add file to staging area
+        console.log(`Added ${fileToBeAdded}`);
+    }
+
 }
 
 const mp2spd = new MP2SPD();
+mp2spd.add("test.txt");
