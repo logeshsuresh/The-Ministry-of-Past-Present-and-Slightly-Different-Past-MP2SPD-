@@ -1,8 +1,13 @@
+#!/usr/bin/env node
+
 import path from "path";
 import fs from "fs/promises";
 import crypto from "crypto";
 import chalk from "chalk";
 import { diffLines } from "diff";
+import { Command } from "commander";
+
+const program = new Command();
 
 class MP2SPD {
 
@@ -166,8 +171,28 @@ class MP2SPD {
 
 }
 
-
-(async () => {
+program.command("init").action(async () => {
     const mp2spd = new MP2SPD();
-    await mp2spd.showCommitDiff("ab612663217554d1a0448405bb4807593c60d284");
-})();
+});
+
+program.command("add <file>").action(async (file) => {
+    const mp2spd = new MP2SPD();
+    await mp2spd.add(file);
+});
+
+program.command("commit <message>").action(async (message) => {
+    const mp2spd = new MP2SPD();
+    await mp2spd.commit(message);
+});
+
+program.command("log").action(async () => {
+    const mp2spd = new MP2SPD();
+    await mp2spd.log();
+});
+
+program.command("show <commitHash>").action(async (commitHash) => {
+    const mp2spd = new MP2SPD();
+    await mp2spd.showCommitDiff(commitHash);
+});
+
+program.parse(process.argv);
