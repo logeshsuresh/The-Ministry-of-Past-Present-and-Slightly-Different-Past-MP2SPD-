@@ -81,11 +81,28 @@ class MP2SPD {
         }  
     }
 
+    async log() {
+        let currentCommitHash = await this.getCurrentHead();
+        while (currentCommitHash) {
+            const commitData = JSON.parse(
+                await fs.readFile(
+                    path.join(this.objectsPath, currentCommitHash), 
+                    { encoding: "utf-8"}
+                )
+            );
+            console.log("++++++++++++++++++++++++++++++++++++++++++++\n");
+            console.log(`Commit: ${currentCommitHash}\nDate: ${commitData.timestamp}\n\n${commitData.message}\n`);
+            console.log("++++++++++++++++++++++++++++++++++++++++++++");
+            currentCommitHash = commitData.parent;
+        }
+    }
+
 }
 
 
 (async () => {
     const mp2spd = new MP2SPD();
     await mp2spd.add("test.txt");
-    await mp2spd.commit("initial commit");
+    await mp2spd.commit("third commit"); 
+    await mp2spd.log();
 })();
