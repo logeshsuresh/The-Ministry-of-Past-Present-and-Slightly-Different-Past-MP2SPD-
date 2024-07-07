@@ -16,7 +16,7 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your system.
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/mp2spd.git
+    git clone https://github.com/logeshsuresh/The-Ministry-of-Past-Present-and-Slightly-Different-Past-MP2SPD-.git
     ```
 2. Navigate to the project directory:
     ```sh
