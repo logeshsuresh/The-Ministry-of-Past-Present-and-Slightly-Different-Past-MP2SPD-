@@ -34,32 +34,40 @@ Make sure you have [Node.js](https://nodejs.org/) installed on your system.
 To initialize a new MP2SPD repository, run:
 ```sh
 ./mp2spd.js init
+```
 
 Add Files
 To add a file to the staging area, run:
-
+```sh
 ./mp2spd.js add <file>
+```
 Replace <file> with the path to the file you want to add.
 
 Commit Changes
 To commit the staged changes with a commit message, run:
-
+```
 ./mp2spd.js commit "<message>"
+```
 Replace <message> with your commit message.
 
 View Logs
 To view the commit history, run:
-
+```sh
 ./mp2spd.js log
+```
+
 Show Differences
 To show the differences between a commit and its parent, run:
-
+```sh
 ./mp2spd.js show <commitHash>
+```
 Replace <commitHash> with the hash of the commit you want to view.
+
 
 Example
 Here is an example workflow:
 
+```sh
 ./mp2spd.js init
 
 echo "Hello World" > hello.txt
@@ -71,3 +79,4 @@ echo "Hello World" > hello.txt
 
 ./mp2spd.js show <commitHash>
 Note: Replace <commitHash> with the actual hash obtained from the ./mp2spd.js log command.
+```
