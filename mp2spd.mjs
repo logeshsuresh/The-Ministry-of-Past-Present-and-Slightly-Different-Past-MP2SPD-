@@ -52,7 +52,40 @@ class MP2SPD {
         await fs.writeFile(this.indexPath, JSON.stringify(index));
     }
 
+    async commit(message) {
+        const index = JSON.parse(await fs.readFile(this.indexPath, { encoding: "utf-8"}));
+        const parentCommit = await this.getCurrentHead();
+        
+        const commitData = {
+            timestamp: new Date().toISOString(),
+            message,
+            files: index,
+            parent: parentCommit
+        }
+
+        const commitHash = this.hashObject(JSON.stringify(commitData));
+        const commitPath = path.join(this.objectsPath, commitHash);
+        await fs.writeFile(commitPath, JSON.stringify(commitData));
+        // update HEAD to point to the new commit
+        await fs.writeFile(this.headPath, commitHash); 
+        // clear the staging area
+        await fs.writeFile(this.indexPath, JSON.stringify([])); 
+        console.log(`Commit successfully created : ${commitHash}`);
+    }
+
+    async getCurrentHead() {
+        try {
+            return await fs.readFile(this.headPath, { encoding : "utf-8"});
+        } catch (error) {
+            return null;
+        }  
+    }
+
 }
 
-const mp2spd = new MP2SPD();
-mp2spd.add("test.txt");
+
+(async () => {
+    const mp2spd = new MP2SPD();
+    await mp2spd.add("test.txt");
+    await mp2spd.commit("initial commit");
+})();
