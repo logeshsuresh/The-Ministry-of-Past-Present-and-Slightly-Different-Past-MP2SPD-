@@ -1,6 +1,8 @@
 import path from "path";
 import fs from "fs/promises";
 import crypto from "crypto";
+import chalk from "chalk";
+import { diffLines } from "diff";
 
 class MP2SPD {
 
@@ -97,12 +99,75 @@ class MP2SPD {
         }
     }
 
+    async showCommitDiff(commitHash) {
+        const commitData = JSON.parse(await this.getCommitData(commitHash));
+        if (!commitData) {
+            console.log("Commit not found");
+            return;
+        }
+        console.log("Changes in the last commit are: ");
+        
+        for (const file of commitData.files) {
+            console.log(`File: ${file.path}`);
+            const fileContent = await this.getFileContent(file.hash);
+            console.log(fileContent);
+
+            if (commitData.parent) {
+                // get the parent commit data
+                const parentCommitData = JSON.parse(await this.getCommitData(commitData.parent));
+                const parentFileContent = await this.getParentFileContent(parentCommitData, file.path);
+                if (parentFileContent !== undefined) {
+                    console.log("\nDiff:");
+                    const diff = diffLines(parentFileContent, fileContent);
+
+                    console.log(diff);
+                    console.log("\n");
+                    diff.forEach(part => {
+                        if (part.added) {
+                            process.stdout.write("++ " + chalk.green(part.value));
+                        } else if (part.removed) {
+                            process.stdout.write("-- " + chalk.red(part.value));
+                        } else {
+                            process.stdout.write(chalk.grey(part.value));
+                        }
+                        console.log("\n");
+                    });
+                    console.log("\n");
+                } else {
+                    console.log("New file commit");
+                }
+            } else {
+                console.log("First commit");
+            }
+        }
+    }
+
+    async getCommitData(commitHash) {
+        const commitPath = path.join(this.objectsPath, commitHash);
+        try {
+            return await fs.readFile(commitPath, { encoding: "utf-8"});
+        } catch (error) {
+            console.log("Failed to read commit data (X)", error);
+            return null;
+        }
+    }
+
+    async getFileContent(fileHash) {
+        const objectPath = path.join(this.objectsPath, fileHash);
+        return fs.readFile(objectPath, { encoding: "utf-8" });
+    }
+
+    async getParentFileContent(parentCommitData, filePath) {
+        const parentFile = parentCommitData.files.find(file => file.path === filePath);
+        if (parentFile) {
+            return await this.getFileContent(parentFile.hash);
+        }
+    }
+
 }
 
 
 (async () => {
     const mp2spd = new MP2SPD();
-    await mp2spd.add("test.txt");
-    await mp2spd.commit("third commit"); 
-    await mp2spd.log();
+    await mp2spd.showCommitDiff("ab612663217554d1a0448405bb4807593c60d284");
 })();
